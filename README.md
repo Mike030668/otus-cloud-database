@@ -4,7 +4,7 @@
    ```bash
    make tf_create_infra
    ```
-1. Загрузка данных в S3 - загружаем данные в S3
+1. Загрузка данных в S3
    ```bash
    make run_uploader
    ```
