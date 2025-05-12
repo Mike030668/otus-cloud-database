@@ -25,6 +25,7 @@ run-uploader:
 .PHONY: sync-repo
 sync-repo:
 	rsync -avz \
+		--exclude=.env \
 		--exclude=.venv \
 		--exclude=.git \
 		--exclude=infra/.terraform \
