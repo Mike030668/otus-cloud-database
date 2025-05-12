@@ -34,7 +34,7 @@ def main() -> None:
 
     # SAVE
     logger.info("Saving iris dataset to parquet...")
-    file_path = os.path.join("data", "iris.parquet")
+    file_path = os.path.join("data", "input", "iris.parquet")
     df.to_parquet(file_path, index=False)
     logger.info(f"Iris dataset saved to {file_path}")
 
