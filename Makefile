@@ -1,18 +1,17 @@
 SHELL := /bin/bash
-
 include .env
 
 tf-init:
-	cd infra && terraform init -upgrade
+	terraform init -upgrade
 
 tf-plan:
-	cd infra && terraform plan
+	terraform plan
 
 tf-apply:
-	cd infra && terraform apply -auto-approve
+	terraform apply -auto-approve
 
 tf-destroy:
-	cd infra && terraform destroy -auto-approve
+	terraform destroy -auto-approve
 
 tf-create-infra: tf-init tf-apply
 
@@ -31,8 +30,9 @@ sync-repo:
 		--exclude=infra/.terraform \
 		--exclude=*.tfstate \
 		--exclude=*.backup \
-		--exclude=*.json . yc-proxy:/home/ubuntu/otus/otus-cloud-database
+		--exclude=*.json \
+		. yc-proxy:/home/ubuntu/otus/otus-cloud-database/
 
 .PHONY: sync-env
 sync-env:
-	rsync -avz yc-proxy:/home/ubuntu/otus/otus-cloud-database/.env .env
+	rsync -avz yc-proxy:/home/ubuntu/otus/otus-cloud-database/.env .
