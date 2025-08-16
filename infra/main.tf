@@ -1,4 +1,4 @@
-# Основной файл конфигурации Terraform
+# main.tf Основной файл конфигурации Terraform
 
 # Создание сети и подсети
 
@@ -149,3 +149,16 @@ resource "null_resource" "update_env_with_db_host" {
     yandex_mdb_mysql_cluster.cluster
   ]
 }
+
+# Установка порта MySQL в .env
+resource "null_resource" "update_env_with_db_port" {
+  provisioner "local-exec" {
+    command = <<EOT
+      # Установка стандартного порта MySQL (3306)
+      echo "DB_PORT=3306" >> ../.env
+    EOT
+  }
+}
+
+
+

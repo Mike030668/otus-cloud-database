@@ -4,6 +4,11 @@ Description:
     This script extracts the iris dataset from sklearn and uploads it to an S3 bucket.
 """
 
+import sys
+
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent
+
 import os
 
 from loguru import logger

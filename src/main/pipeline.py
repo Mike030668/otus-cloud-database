@@ -6,7 +6,18 @@ Description:
 """
 
 import os
+# Проверка наличия переменных
+print("S3_ACCESS_KEY:", os.getenv("S3_ACCESS_KEY"))
+print("S3_SECRET_KEY:", os.getenv("S3_SECRET_KEY"))
+print("S3_BUCKET_NAME:", os.getenv("S3_BUCKET_NAME"))
+
 import sys
+
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent))
+
+from config.database import ENGINE_MYSQL
+
 
 from loguru import logger
 import pandas as pd

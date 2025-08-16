@@ -1,19 +1,18 @@
 SHELL := /bin/bash
 include .env
+export $(shell sed 's/=.*//' .env)
 
 tf-init:
-	terraform init -upgrade
+	terraform -chdir=infra init -upgrade
 
 tf-plan:
-	terraform plan
+	terraform -chdir=infra plan
 
 tf-apply:
-	terraform apply -auto-approve
+	terraform -chdir=infra apply -auto-approve
 
 tf-destroy:
-	terraform destroy -auto-approve
-
-tf-create-infra: tf-init tf-apply
+	terraform -chdir=infra destroy -auto-approve
 
 run-pipeline:
 	python3 src/main/pipeline.py
@@ -24,14 +23,14 @@ run-uploader:
 .PHONY: sync-repo
 sync-repo:
 	rsync -avz \
-		--exclude=.env \
-		--exclude=.venv \
-		--exclude=.git \
-		--exclude=infra/.terraform \
-		--exclude=*.tfstate \
-		--exclude=*.backup \
-		--exclude=*.json \
-		. yc-proxy:/home/ubuntu/otus/otus-cloud-database/
+ 	--exclude=.env \
+ 	--exclude=.venv \
+ 	--exclude=.git \
+ 	--exclude=infra/.terraform \
+ 	--exclude=*.tfstate \
+ 	--exclude=*.backup \
+ 	--exclude=*.json \
+ 	. yc-proxy:/home/ubuntu/otus/otus-cloud-database/
 
 .PHONY: sync-env
 sync-env:
