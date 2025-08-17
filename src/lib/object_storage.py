@@ -5,7 +5,7 @@ Description:
     and download files from an S3-compatible bucket in Yandex Cloud.
 """
 from typing import Optional
-
+import os
 import boto3
 from botocore.exceptions import ClientError
 from loguru import logger
@@ -37,16 +37,24 @@ def upload_file_to_s3(
     bool
         True if file was uploaded successfully, else False
     """
-    if object_name is None:
-        object_name = file_path.split('/')[-1]
+    access_key = os.getenv("S3_ACCESS_KEY")
+    secret_key = os.getenv("S3_SECRET_KEY")
+    endpoint_url = os.getenv("S3_ENDPOINT_URL", "https://storage.yandexcloud.net")
+
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        endpoint_url=endpoint_url
+    )
 
     try:
-        s3_resource.Bucket(bucket_name).upload_file(file_path, object_name)
-        logger.info(f"Successfully uploaded {file_path} to {bucket_name}/{object_name}")
-        return True
+        s3_client.upload_file(file_path, bucket_name, object_name)
+        print(f"Файл {file_path} успешно загружен как {object_name}")
     except ClientError as e:
-        logger.error(f"Error uploading file to S3: {e}")
-        return False
+        print(f"Ошибка загрузки: {e}")
+
+        
 
 def download_file_from_s3(
     bucket_name: str,
@@ -73,10 +81,23 @@ def download_file_from_s3(
     bool
         True if file was downloaded successfully, else False
     """
+    # Используем переменные окружения из .env
+    access_key = os.getenv("S3_ACCESS_KEY")
+    secret_key = os.getenv("S3_SECRET_KEY")
+    endpoint_url = os.getenv("S3_ENDPOINT_URL", "https://storage.yandexcloud.net")
+
+    # Создаем клиент S3 с явным указанием endpoint_url
+    s3_resource = boto3.resource(
+        "s3",
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        endpoint_url=endpoint_url
+    )
+
     try:
         s3_resource.Bucket(bucket_name).download_file(object_name, file_path)
-        logger.info(f"Successfully downloaded {bucket_name}/{object_name} to {file_path}")
-        return True
     except ClientError as e:
-        logger.error(f"Error downloading file from S3: {e}")
-        return False
+        if e.response["Error"]["Code"] == "404":
+            print("Файл не найден в бакете")
+        else:
+            raise

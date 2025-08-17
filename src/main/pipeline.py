@@ -7,6 +7,9 @@ Description:
 
 import os
 # Проверка наличия переменных
+print("DB_PASS:", os.getenv("DB_PASS"))
+print("DB_PORT:", os.getenv("DB_PORT"))
+print("DB_NAME:", os.getenv("DB_NAME"))
 print("S3_ACCESS_KEY:", os.getenv("S3_ACCESS_KEY"))
 print("S3_SECRET_KEY:", os.getenv("S3_SECRET_KEY"))
 print("S3_BUCKET_NAME:", os.getenv("S3_BUCKET_NAME"))

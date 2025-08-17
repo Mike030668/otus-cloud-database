@@ -102,7 +102,7 @@ resource "yandex_mdb_mysql_cluster" "cluster" {
   network_id  = yandex_vpc_network.network.id
   version     = var.yc_mysql_version
 
-  resources {
+resources {
     resource_preset_id = var.mysql_resource_preset_id
     disk_type_id       = var.mysql_disk_type_id
     disk_size          = var.mysql_disk_size
@@ -152,13 +152,73 @@ resource "null_resource" "update_env_with_db_host" {
 
 # Установка порта MySQL в .env
 resource "null_resource" "update_env_with_db_port" {
+  depends_on = [yandex_mdb_mysql_cluster.cluster]
+
   provisioner "local-exec" {
     command = <<EOT
-      # Установка стандартного порта MySQL (3306)
+      # Удаляем старую строку с DB_PORT, если она есть
+      sed -i '/^DB_PORT=/d' ../.env
+
+      # Добавляем новую строку с портом
       echo "DB_PORT=3306" >> ../.env
     EOT
   }
 }
 
 
+resource "null_resource" "update_env_with_db_user" {
+  depends_on = [yandex_mdb_mysql_user.user]
 
+  provisioner "local-exec" {
+    command = <<EOT
+      # Определяем переменную DB_USER из имени пользователя базы данных
+      DB_USER=${yandex_mdb_mysql_user.user.name}
+
+      # Замена переменной DB_USER в .env
+      sed -i "s/^DB_USER=.*/DB_USER=$DB_USER/" ../.env
+    EOT
+  }
+}
+
+resource "null_resource" "update_env_with_db_password" {
+  depends_on = [yandex_mdb_mysql_user.user]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      # Удаляем старую строку с DB_PASSWORD, если она есть
+      sed -i '/^DB_PASSWORD=/d' ../.env
+
+      # Добавляем новую строку с паролем
+      echo "DB_PASSWORD=${yandex_mdb_mysql_user.user.password}" >> ../.env
+    EOT
+  }
+}
+
+
+
+resource "null_resource" "update_env_with_db_name" {
+  depends_on = [yandex_mdb_mysql_database.db]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      # Определяем переменную DB_NAME из имени базы данных
+      DB_NAME=${yandex_mdb_mysql_database.db.name}
+
+      # Замена переменной DB_NAME в .env
+      sed -i "s/^DB_NAME=.*/DB_NAME=$DB_NAME/" ../.env
+    EOT
+  }
+}
+
+
+resource "null_resource" "update_env_with_ssl_path" {
+  provisioner "local-exec" {
+    command = <<EOT
+      # Удаляем старую строку с SSL_PATH
+      sed -i '/^SSL_PATH=/d' ../.env
+
+      # Добавляем новый путь (пример пути)
+      echo "SSL_PATH=/home/mike030668/study_projects/OTUS_MLOPS_CODE/otus-cloud-database/certs/ca.pem" >> ../.env
+    EOT
+  }
+}

@@ -3,16 +3,16 @@ include .env
 export $(shell sed 's/=.*//' .env)
 
 tf-init:
-	terraform -chdir=infra init -upgrade
+	cd infra && terraform init -upgrade
 
 tf-plan:
-	terraform -chdir=infra plan
+	cd infra && terraform plan
 
 tf-apply:
-	terraform -chdir=infra apply -auto-approve
+	cd infra && terraform apply -auto-approve
 
 tf-destroy:
-	terraform -chdir=infra destroy -auto-approve
+	cd infra && terraform destroy -auto-approve
 
 run-pipeline:
 	python3 src/main/pipeline.py
